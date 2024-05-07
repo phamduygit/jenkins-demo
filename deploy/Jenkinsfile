@@ -2,21 +2,21 @@ pipeline {
     agent any
     
     stages {
-        stage('Build') {
+        stage('Packaging/Pushing imagae') {
+
             steps {
-                // Pull the Docker image
-                script {
-                    docker.image('duybroooo/lightweight-echo:latest').pull()
+                withDockerRegistry(credentialsId: 'dockerhub', url: 'https://index.docker.io/v1/') {
+                    sh 'docker build -t duybroooo/lightweight-echo .'
+                    sh 'docker push duybroooo/lightweight-echo'
                 }
             }
         }
         
-        stage('Run') {
+        stage('Pull and Run') {
             steps {
-                // Run the Docker container
-                script {
-                    docker.image('duybroooo/lightweight-echo:latest').run('--rm -p 3000:3000')
-                }
+                echo 'Deploying and cleaning'
+                sh 'docker pull duybroooo/lightweight-echo'
+                sh 'docker run -d --rm --name duybroooo-lightweight-echo -e PORT=3000 -p 3000:3000 duybroooo/lightweight-echo'
             }
         }
     }
