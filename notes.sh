@@ -30,3 +30,8 @@ docker run \
   --volume jenkins-data:/var/jenkins_home \
   --volume jenkins-docker-certs:/certs/client:ro \
   myjenkins-blueocean:2.440.3-1
+
+# Docker create image for application
+docker build -t lightweight-echo . 
+# Docker run image of application
+docker run -e PORT=3000 -p 3000:3000 duybroooo/lightweight-echo
