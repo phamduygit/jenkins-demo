@@ -2,8 +2,7 @@ pipeline {
     agent any
 
     stages {
-        stage('Packaging/Pushing imagae') {
-
+        stage('Packaging/Pushing Image') {
             steps {
                 withDockerRegistry(credentialsId: 'dockerhub', url: 'https://index.docker.io/v1/') {
                     sh 'docker build -t duybroooo/lightweight-echo .'
@@ -16,7 +15,12 @@ pipeline {
             steps {
                 echo 'Deploying and cleaning'
                 sh 'docker pull duybroooo/lightweight-echo'
-                sh 'docker run -d --name duybroooo-lightweight-echo -e PORT=3000 -p 3000:3000 duybroooo/lightweight-echo'
+                
+                // Ensure any previous container is stopped and removed
+                sh 'docker stop duybroooo-lightweight-echo || true && docker rm duybroooo-lightweight-echo || true'
+                
+                // Run the container on the host machine's network
+                sh 'docker run -d --name duybroooo-lightweight-echo --network="host" -e PORT=3000 duybroooo/lightweight-echo'
             }
         }
     }
